@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">서울대원격</string>
+    <string name="SERVER_URL">http://3.35.240.138:3333/</string>
+    <string name="COMMAND_LOGIN">Identification</string>
+    <string name="COMMAND_ENDPOINT">return_endpoint</string>
+    <string name="COMMAND_INITIALIZE">streaming_start</string>
+    <string name="COMMAND_TERMINATE">streaming_termination</string>
+</resources>

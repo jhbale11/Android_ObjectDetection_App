@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            android:src="@drawable/loginback"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="350dp"
+                android:layout_height="450dp"
+                android:orientation="vertical"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="#193988"
+                android:paddingTop="50dp"
+                android:layout_margin="40dp"
+                android:elevation="20dp"
+                android:paddingBottom="20dp"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/snu_logo_alt" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:text="서울대학교 원격 시험 클라이언트"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:paddingTop="20dp">
+
+                        <EditText
+                            android:id="@+id/editTextName"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            android:textSize="18dp"
+                            android:textColorHint="@color/snu_silver"
+                            android:hint="이름"
+                            android:background="@drawable/rounded_corner"
+                            android:layout_margin="5dp"
+                            android:elevation="5dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="25dp"
+                            android:drawableLeft="@drawable/ic_account_circle_black_24dp"
+                            android:drawableTint="@color/snu_silver"/>
+
+                        <EditText
+                            android:id="@+id/editTextID"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center"
+                            android:hint="2020-10000"
+                            android:textSize="18dp"
+                            android:textColorHint="@color/snu_silver"
+                            android:textColor="@color/black"
+                            android:background="@drawable/rounded_corner"
+                            android:layout_margin="5dp"
+                            android:elevation="5dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="25dp"
+                            android:drawableLeft="@drawable/ic_key_black_24dp"
+                            android:drawableTint="@color/snu_silver"/>
+
+                        <Button
+                            app:backgroundTint="@null"
+                            android:id="@+id/btn_login"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:text="LOGIN"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:textStyle="bold"
+                            android:layout_margin="5dp"
+                            android:elevation="5dp"
+                            android:background="@drawable/login_button_background" />
+
+                        <Button
+                            app:backgroundTint="@null"
+                            android:id="@+id/btn_request"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:text="No Exam Available"
+                            android:textAllCaps="false"
+                            android:textStyle="bold"
+                            android:textSize="16dp"
+                            android:textColor="@color/white"
+                            android:layout_margin="5dp"
+                            android:enabled="false"
+                            android:elevation="5dp"
+                            android:background="@drawable/login_button_background" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewLoginInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:text="Login Information - test session"
+            android:visibility="invisible"
+            android:textSize="16dp" />
+
+        <Button
+            android:id="@+id/btn_debug"
+            android:layout_width="80dp"
+            android:background="#80000000"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textAllCaps="false"
+            android:text="debug"/>
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <com.pedro.rtplibrary.view.OpenGlView
+            android:id="@+id/openGlView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/textViewTimer"
+                android:backgroundTint="#80000000"
+                android:background="@drawable/rounded_corner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:paddingHorizontal="10dp"
+                android:text="00 : 00 : 00"
+                android:textSize="20dp"
+                android:layout_margin="10dp"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/textViewCurrentState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:text="송출 중이 아닙니다"
+            android:textSize="30dp"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/imageViewCapture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:visibility="invisible"
+            android:background="#00ff00"/>
+
+        <TextView
+            android:id="@+id/textViewUserInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:textAlignment="center"
+            android:textColor="@color/red"
+            android:textSize="15dp"
+            android:visibility="invisible"
+            android:text="userName : blahbalh\nuserId : 2020-00000\nmacAddress : 1.1.1.1"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:gravity="bottom">
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="right">
+
+            <ImageView
+                app:backgroundTint="@null"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:background="@drawable/streaming_button_outside"
+                android:layout_margin="10dp" />
+
+            <Button
+                app:backgroundTint="@null"
+                android:id="@+id/btn_start"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center"
+                android:background="@drawable/streaming_button_inside_0"/>
+
+            <Button
+                app:backgroundTint="@null"
+                android:id="@+id/btn_camera_change"
+                android:layout_gravity="bottom"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="26dp"
+                android:background="@drawable/ic_cameraswitch_white_24dp" />
+        </FrameLayout>
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
