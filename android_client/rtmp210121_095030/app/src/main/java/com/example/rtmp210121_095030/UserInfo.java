@@ -11,7 +11,7 @@ public class UserInfo implements Serializable {
         userID="2020-00000";
         macAdr="1";
         rtmpURL="rtmp://1.1.1.1";
-        lecID="logicDesign.midterm_20210110";
+        tablename="logicDesign.midterm_20210110_1200_1330";
         table="logicdesign_midterm_20210110_1200_1330";
     }
 
@@ -19,14 +19,14 @@ public class UserInfo implements Serializable {
     public void setUserID(String userID) { this.userID = userID; }
     public void setMacAdr(String macAdr) { this.macAdr = macAdr; }
     public void setRtmpURL(String rtmpURL) { this.rtmpURL = rtmpURL; }
-    public void setLecID(String lecID) { this.lecID = lecID; }
+    public void setTablename(String tablename) { this.tablename = tablename; }
     public void setTable(String table) { this.table = table; }
 
     public String getUserName() { return userName; }
     public String getUserID() { return userID; }
     public String getMacAdr() { return macAdr; }
     public String getRtmpURL() { return rtmpURL; }
-    public String getLecID() { return lecID; }
+    public String getTablename() { return tablename; }
     public String getTable() { return table; }
     public String getLecName() {
         String[] part = table.split("_");
@@ -57,12 +57,12 @@ public class UserInfo implements Serializable {
                 parameterSet.put("num",userID);
                 parameterSet.put("name",userName);
                 parameterSet.put("mac", macAdr);
-                parameterSet.put("lec_id",lecID);
+                parameterSet.put("tablename",table);
                 break;
             default:
                 parameterSet.put("num",userID);
                 parameterSet.put("name",userName);
-                parameterSet.put("lec_id",lecID);
+                parameterSet.put("tablename",table);
                 parameterSet.put("mac",macAdr);
                 break;
         }
@@ -75,10 +75,10 @@ public class UserInfo implements Serializable {
         stringBuffer.append("\nuserID : ").append(userID);
         stringBuffer.append("\nmacAddress : ").append(macAdr);
         stringBuffer.append("\nRTMP URL : ").append(rtmpURL);
-        stringBuffer.append("\nLEC ID : ").append(lecID);
+        stringBuffer.append("\nTable Name : ").append(tablename);
         stringBuffer.append("\ntable : ").append(table);
         return stringBuffer.toString();
     }
 
-    private String userName, userID, macAdr, rtmpURL, lecID, table;
+    private String userName, userID, macAdr, rtmpURL, tablename, table;
 }

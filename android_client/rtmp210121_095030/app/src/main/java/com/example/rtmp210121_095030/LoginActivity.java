@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             //userInfo.setLecID(RESPONSE_MESSAGE);
 
                             String[] part = RESPONSE_MESSAGE.split("_");
-                            userInfo.setLecID(part[0] + "." +part[1] + "_" + part[2]);
+                            userInfo.setTablename(part[0] + "." +part[1] + "_" + part[2]);
 
                             ShowToastMessage("Subject : " + part[0]);
                             LoginActivity.this.runOnUiThread(new Runnable() {
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void run() {
                         RESPONSE_MESSAGE = new ServerRequest(1, userInfo, context).Request();
-                        //RESPONSE_MESSAGE = "rtmp://~~~";
+                        RESPONSE_MESSAGE = "rtmp://3.35.108.14/channel2/092cd759-822c-46fe-83ba-da0d4246374f";
                         Pattern pattern = Pattern.compile("^rtmp://\\S*$");
                         if (pattern.matcher(RESPONSE_MESSAGE).find()) {
                             userInfo.setRtmpURL(RESPONSE_MESSAGE);

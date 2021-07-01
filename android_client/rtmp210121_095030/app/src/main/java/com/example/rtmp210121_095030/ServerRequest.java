@@ -2,14 +2,30 @@ package com.example.rtmp210121_095030;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonNull;
+
 
 public class ServerRequest {
 
@@ -60,6 +76,7 @@ public class ServerRequest {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public String Request() {
         try{
             /* connection setting */
@@ -105,14 +122,44 @@ public class ServerRequest {
             }
             InputStreamReader inputStreamReader = new InputStreamReader(conn.getInputStream(), "EUC-KR");
             BufferedReader reader = new BufferedReader(inputStreamReader);
+            Scanner scan = new Scanner(inputStreamReader);
+            JsonReader jsonreader = new JsonReader(inputStreamReader);
+
+            Log.d("Server Request", "inputStreamReader : " + inputStreamReader);
+
             String line;
             StringBuffer page = new StringBuffer();
-            while ((line = reader.readLine()) != null) {
-                page.append(line);
+
+            //RTMP URL : get rtmp endpoint url when type 1
+            //Response format : {"0":"rtmp://3.35.108.14/channel2/092cd759-822c-46fe-83ba-da0d4246374f"}
+            if(this.type == 1){
+                /*
+                if (jsonreader.peek() == JsonToken.NULL) {
+                    jsonreader.nextNull();
+                    return null;
+                }
+                 */
+                jsonreader.beginObject();
+                while(jsonreader.hasNext()) {
+                    String macaddr = jsonreader.nextName();
+                    if (macaddr.equals("0")) {
+                        RESPONSE_MESSAGE = jsonreader.nextString();
+                        Log.d("Server Request", "RESPONSE MESSAGE : " + RESPONSE_MESSAGE);
+                    } else {
+                        jsonreader.skipValue();
+                    }
+                }
+                jsonreader.endObject();
+                //Log.d("Server Request", "RESPONSE MESSAGE : " + RESPONSE_MESSAGE);
             }
-            reader.close();
-            RESPONSE_MESSAGE = page.toString();
-            Log.d("Server Request", "RESPONSE MESSAGE : " + RESPONSE_MESSAGE);
+            else{
+                while ((line = reader.readLine()) != null) {
+                    page.append(line);
+                }
+                reader.close();
+                RESPONSE_MESSAGE = page.toString();
+                Log.d("Server Request", "RESPONSE MESSAGE : " + RESPONSE_MESSAGE);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             RESPONSE_MESSAGE = "0";

@@ -4,14 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
+import android.media.ImageReader;
+import android.media.MediaCodec;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.DisplayMetrics;
@@ -31,24 +38,42 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.pedro.encoder.input.video.CameraCallbacks;
 import com.pedro.encoder.input.video.CameraHelper;
+import com.pedro.encoder.utils.gl.ImageStreamObject;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.pedro.rtplibrary.rtmp.RtmpCamera2;
 import com.pedro.rtplibrary.view.GlInterface;
 import com.pedro.rtplibrary.view.OpenGlView;
+import com.pedro.rtplibrary.view.TakePhotoCallback;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import android.content.Context;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.common.model.LocalModel;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.objects.DetectedObject;
+import com.google.mlkit.vision.objects.ObjectDetection;
+import com.google.mlkit.vision.objects.ObjectDetector;
+import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions;
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions;
+import com.google.mlkit.vision.objects.defaults.PredefinedCategory;
 
 public class MainActivity extends AppCompatActivity implements ConnectCheckerRtmp, SurfaceHolder.Callback, View.OnClickListener {
 
@@ -63,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements ConnectCheckerRtm
     private String RESPONSE_MESSAGE;
 
     private UserInfo userInfo;
+
 
     private Button btn_start;
     private Button btn_option;
@@ -168,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements ConnectCheckerRtm
         } else {
             btn_start.setBackgroundResource(R.drawable.streaming_button_inside_0);
         }
+
+        //Object Detection
+        if(rtmpCamera2.isStreaming()){
+            useCustomObjectDetector();
+        }
     }
 
     @Override
@@ -223,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements ConnectCheckerRtm
 
         textViewStreamInfo.setVisibility(View.INVISIBLE);
         //textViewUserInfo.setVisibility(View.INVISIBLE);
+
     }
 
     @Override
@@ -332,5 +364,227 @@ public class MainActivity extends AppCompatActivity implements ConnectCheckerRtm
                 Toast.makeText(MainActivity.this, str, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Object Detection Part!!
+    // Can Use DefaultObjectDetector
+    private void useDefaultObjectDetector() {
+        // [START create_default_options]
+        // Live detection and tracking
+        ObjectDetectorOptions options =
+                new ObjectDetectorOptions.Builder()
+                        .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
+                        .enableClassification()  // Optional
+                        .build();
+
+        // Multiple object detection in static images
+        /*options =
+                new ObjectDetectorOptions.Builder()
+                        .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+                        .enableMultipleObjects()
+                        .enableClassification()  // Optional
+                        .build();*/
+        // [END create_default_options]
+
+        // [START create_detector]
+        ObjectDetector objectDetector = ObjectDetection.getClient(options);
+        // [END create_detector]
+
+        InputImage image =
+                InputImage.fromBitmap(Bitmap.createBitmap(new int[640 * 480], 640, 480, Bitmap.Config.ARGB_8888), 0);
+
+
+        // [START process_image]
+        objectDetector.process(image)
+                .addOnSuccessListener(
+                        new OnSuccessListener<List<DetectedObject>>() {
+                            @Override
+                            public void onSuccess(List<DetectedObject> detectedObjects) {
+                                // Task completed successfully
+                                // ...
+                                Log.i("ObjectDetection","Object Detector process image success!");
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Task failed with an exception
+                                // ...
+                                Log.i("ObjectDetection","Object Detector process image failed!");
+                            }
+                        });
+        // [END process_image]
+
+        List<DetectedObject> results = new ArrayList<>();
+        // [START read_results_default]
+        // The list of detected objects contains one item if multiple
+        // object detection wasn't enabled.
+        for (DetectedObject detectedObject : results) {
+            Rect boundingBox = detectedObject.getBoundingBox();
+            Integer trackingId = detectedObject.getTrackingId();
+            for (DetectedObject.Label label : detectedObject.getLabels()) {
+                String text = label.getText();
+                if (PredefinedCategory.FOOD.equals(text)) {
+                    // ...
+                    Log.i("ObjectDetection","Detected Object Label : "+text);
+                }
+                int index = label.getIndex();
+                if (PredefinedCategory.FOOD_INDEX == index) {
+                    // ...
+                    Log.i("ObjectDetection","Detected Object Index : " + index);
+                }
+                float confidence = label.getConfidence();
+                float x = boundingBox.left;
+                float y = boundingBox.top;
+                float w = boundingBox.width();
+                float h = boundingBox.height();
+                Log.i("ObjectDetection", "Detected Position : "+ "x : "+x
+                        +"y : "+ y +"w : "+ w +"h : "+ h);
+            }
+        }
+        // [END read_results_default]
+    }
+
+    // Can Use Object Detector of Trained Model - Put trained tflite file to Assets Folder!
+    private void useCustomObjectDetector() {
+        // [START set_metadata]
+        // TODO How do we document the FrameMetadata developers need to implement?
+        ImageReader mReader = ImageReader.newInstance(640, 480, ImageFormat.YV12, 20);
+        // [END set_metadata]
+
+        //[START image_from_Bitmap]
+        //InputImage image = InputImage.fromBitmap(Bitmap.createBitmap(new int[640 * 480], 640, 480, Bitmap.Config.ARGB_8888), 0);
+        InputImage image = InputImage.fromBitmap(getBitmap(mReader),0);
+
+
+
+        // [START image_from_buffer]
+        InputImage image1 = InputImage.fromByteBuffer(getByteBuffer(mReader),
+                /* image width */ 640,
+                /* image height */ 480,
+                0,
+                InputImage.IMAGE_FORMAT_YV12 // or IMAGE_FORMAT_YV12
+        );
+
+
+        // [START create_local_model]
+        LocalModel localModel =
+                new LocalModel.Builder()
+                        .setAssetFilePath("mobilenet_v1_0.25_160_quantized_1_metadata_1.tflite")
+                        //.setAbsoluteFilePath("C:\\Users\\82104\\AndroidStudioProjects\\rtmp21\\android_client_0610\\rtmp210617_095030\\app\\src\\main\\assets\\mobilenet_v1_0.25_160_quantized_1_metadata_1.tflite")
+                        .build();
+        // [END create_local_model]
+
+        // [START create_custom_options]
+        // Live detection and tracking
+        CustomObjectDetectorOptions options =
+                new CustomObjectDetectorOptions.Builder(localModel)
+                        .setDetectorMode(CustomObjectDetectorOptions.STREAM_MODE)
+                        .enableClassification()
+                        .setClassificationConfidenceThreshold(0.5f)
+                        .setMaxPerObjectLabelCount(3)
+                        .build();
+
+        // Multiple object detection in static images
+        /*
+        options =
+                new CustomObjectDetectorOptions.Builder(localModel)
+                        .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
+                        .enableMultipleObjects()
+                        .enableClassification()
+                        .setClassificationConfidenceThreshold(0.5f)
+                        .setMaxPerObjectLabelCount(3)
+                        .build();
+        // [END create_custom_options]
+           */
+        ObjectDetector customObjectDetector = ObjectDetection.getClient(options);
+
+        customObjectDetector.process(image)
+                .addOnSuccessListener(
+                        new OnSuccessListener<List<DetectedObject>>() {
+                            @Override
+                            public void onSuccess(List<DetectedObject> detectedObjects) {
+                                // Task completed successfully
+                                // ...
+                                Log.i("ObjectDetection","Object Detector process image success!");
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Task failed with an exception
+                                // ...
+                                Log.i("ObjectDetection","Object Detector process image failed!");
+                            }
+                        });
+
+        List<DetectedObject> results = new ArrayList<>();
+        // [START read_results_custom]
+        // The list of detected objects contains one item if multiple
+        // object detection wasn't enabled.
+        for (DetectedObject detectedObject : results) {
+            Rect boundingBox = detectedObject.getBoundingBox();
+            Integer trackingId = detectedObject.getTrackingId();
+            for (DetectedObject.Label label : detectedObject.getLabels()) {
+                String text = label.getText();
+                int index = label.getIndex();
+                float confidence = label.getConfidence();
+                float x = boundingBox.left;
+                float y = boundingBox.top;
+                float w = boundingBox.width();
+                float h = boundingBox.height();
+                Log.i("ObjectDetection", "Detected Object : "+ text + "/ x : "+x
+                        +"y : "+ y +"w : "+ w +"h : "+ h + "confidence : " + confidence);
+            }
+        }
+        // [END read_results_custom]
+    }
+
+    private void imageFromBuffer(ByteBuffer byteBuffer, int rotationDegrees) {
+        // [START set_metadata]
+        // TODO How do we document the FrameMetadata developers need to implement?
+        ImageReader mReader = ImageReader.newInstance(640, 480, ImageFormat.YV12, 3);
+
+        // [END set_metadata]
+
+        // [START image_from_buffer]
+        InputImage image = InputImage.fromByteBuffer(getByteBuffer(mReader),
+                /* image width */ 640,
+                /* image height */ 480,
+                rotationDegrees,
+                InputImage.IMAGE_FORMAT_YV12 // or IMAGE_FORMAT_YV12
+        );
+        // [END image_from_buffer]
+    }
+
+    public ByteBuffer getByteBuffer(ImageReader reader) {
+        final Image image = reader.acquireLatestImage();
+        if (image == null) {
+            return null;
+        }
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] imageBytes = new byte[buffer.remaining()];
+        buffer.get(imageBytes);
+        return buffer;
+
+    }
+
+    public Bitmap getBitmap(ImageReader reader){
+        final Image image = reader.acquireLatestImage();
+        final Image.Plane[] planes = image.getPlanes();
+        final ByteBuffer buffer = planes[0].getBuffer();
+        int offset = 0;
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * previewWidth;
+
+        // create bitmap
+        Bitmap bitmap = Bitmap.createBitmap(previewWidth+rowPadding/pixelStride, previewHeight, Bitmap.Config.RGB_565);
+        bitmap.copyPixelsFromBuffer(buffer);
+        image.close();
+
+        return bitmap;
     }
 }
