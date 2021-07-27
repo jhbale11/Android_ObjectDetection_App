@@ -1,5 +1,7 @@
 #### android_client
 android client/ android object detection
+![image](https://user-images.githubusercontent.com/16810004/127075248-a3362d51-40b2-4331-8ed3-409bd73f343e.png)
+![image](https://user-images.githubusercontent.com/16810004/127075276-dfcfe8f2-8f02-435f-a433-2522e57dbfbb.png)
 
 #### 안드로이드 클라이언트 Class 설명
 
